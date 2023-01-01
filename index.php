@@ -25,10 +25,10 @@ class PrivatModel
     public $date;
     public array $exchangeRate;
 
-    function __construct( public $bank, public $baseCurrency, public $baseCurrencyLit, PrivatCurrencyModel ...$exchangeRate)
+    function __construct(public $bank, public $baseCurrency, public $baseCurrencyLit, PrivatCurrencyModel ...$exchangeRate)
     {
         $this->date = date("d-m-Y");
-        $this->exchangeRate=$exchangeRate;
+        $this->exchangeRate = $exchangeRate;
     }
 
     function __destruct()
@@ -36,14 +36,9 @@ class PrivatModel
         echo "</br>Вызов деструктора";
     }
 
-
-    function displayInfo()
+    public function __toString()
     {
-        echo "</br>name : $this->bank; $this->date";
-    }
-
-    public function __toString() {
-        return $this->bank .'</br>'. $this->baseCurrency .'</br>'. $this->baseCurrencyLit;
+        return $this->bank . '</br>' . $this->baseCurrency . '</br>' . $this->baseCurrencyLit;
     }
 
 
@@ -56,8 +51,9 @@ class PrivatCurrencyModel
 
     }
 
-    public function __toString() {
-        return $this->baseCurrency .'</br>'. $this->currency .'</br>'. $this->saleRateNB .'</br>'.  $this->purchaseRateNB;
+    public function __toString()
+    {
+        return $this->baseCurrency . '</br>' . $this->currency . '</br>' . $this->saleRateNB . '</br>' . $this->purchaseRateNB;
     }
 
     function __destruct()
@@ -66,19 +62,19 @@ class PrivatCurrencyModel
     }
 }
 
-
-$privatCurrencyModel = new PrivatCurrencyModel("UAH", "AUD", 24.4169000, 24.4169000);
-$model = new PrivatModel( "PB", 980, "UAH");
-$model->displayInfo();
-
 $url = "https://api.privatbank.ua/p24api/exchange_rates?json&date=20.09.2022";
 $json = getJsonCurrency($url);
-$object = json_decode($json);
+$decoded_object = json_decode($json);
 
-$date =  $object->{'exchangeRate'};
-print_r($date);
-$var = $date[0]->saleRateNB;
-echo $var;
+$currencies_list = $decoded_object->{'exchangeRate'};
+$result = null;
+
+foreach ($currencies_list as $currency_item) {
+    if ($currency_item->currency == 'USD') {
+        $result = $currency_item;
+    }
+}
+print_r("Currency value is : " . $result->saleRateNB);
 
 ?>
 
